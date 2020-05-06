@@ -3,6 +3,8 @@ import Icon from "@material-ui/core/Icon";
 import Card from "@material-ui/core/Card";
 import Textarea from "react-textarea-autosize";
 import Button from "@material-ui/core/Button";
+import {connect} from 'react-redux';
+import {addList, addCard} from '../actions';
 
 class TrelloActionButton extends Component {
 
@@ -25,12 +27,40 @@ class TrelloActionButton extends Component {
 
     handleInputChange = e => {
         this.setState({
-            text: e.value
+            text: e.target.value
         })
     }
 
+    handleAddList = () => {
+        const {dispatch} = this.props;
+        const {text} = this.state;
+
+        if (text) {
+            this.setState({
+                text: ''
+            })
+            dispatch(addList(text))
+        }
+
+        return;
+    };
+
+    handleAddCard = () => {
+        const {dispatch, listID} = this.props;
+        const {text} = this.state;
+
+        if (text) {
+            this.setState({
+                text: ''
+            })
+            dispatch(addCard(listID, text))
+        }
+
+        return;
+    }
+
     renderAddButton = () => {
-        const { list } = this.props;
+        const {list} = this.props;
 
         const buttonText = list ? 'Add another list' : 'Add another card';
         const buttonTextOpacity = list ? 1 : 0.5;
@@ -41,10 +71,11 @@ class TrelloActionButton extends Component {
             <div
                 onClick={this.openForm}
                 style={{
-                ...styles.openFormButtonGroup,
-                opacity: buttonTextOpacity,
-                color: buttonTextColor,
-                backgroundColor: buttonTextBackground}}
+                    ...styles.openFormButtonGroup,
+                    opacity: buttonTextOpacity,
+                    color: buttonTextColor,
+                    backgroundColor: buttonTextBackground
+                }}
             >
                 <Icon>add</Icon>
                 <p>{buttonText}</p>
@@ -54,11 +85,10 @@ class TrelloActionButton extends Component {
 
     renderForm = () => {
 
-        const { list } = this.props;
+        const {list} = this.props;
         const placeholder = list ? 'Enter list title...' : 'Enter title for this card';
 
         const buttonTitle = list ? 'Add List' : 'Add Card';
-
 
 
         return (
@@ -86,12 +116,13 @@ class TrelloActionButton extends Component {
                 </Card>
                 <div style={styles.formButtonGroup}>
                     <Button
+                        onMouseDown={list ? this.handleAddList : this.handleAddCard}
                         varient="contained"
                         style={{color: "white", backgroundColor: "#5aac44"}}
                     >
                         {buttonTitle}{" "}
                     </Button>
-                    <Icon style={{ marginLeft: 8, cursor: "pointer" }}>close</Icon>
+                    <Icon style={{marginLeft: 8, cursor: "pointer"}}>close</Icon>
                 </div>
             </div>
         );
@@ -120,4 +151,4 @@ const styles = {
     }
 }
 
-export default TrelloActionButton;
+export default connect()(TrelloActionButton);
